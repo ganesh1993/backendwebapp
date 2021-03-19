@@ -52,7 +52,18 @@ const profile = async function (req, res) {
   return ReS(res, user, 200, start);
 };
 
+const userLogin = async function (req, res) {
+  let err, user;
+  let start = new Date();
+  const userInfo = req.body;
+
+  [err, user] = await to(userService.userLogin(userInfo));
+  if (err) return ReE(res, err, 200);
+  console.log(user);
+  return ReS(res, {message:user}, 200, start);
+};
 
 
 
-module.exports = { getUsers, save, profile};
+
+module.exports = { getUsers, save, profile, userLogin};

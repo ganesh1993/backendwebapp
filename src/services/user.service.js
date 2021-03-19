@@ -4,8 +4,26 @@ const Op = Sequelize.Op;
 const _ = require('lodash');
 const Models = require('./../models/model');
 const CommonService = require('../services/common.service');
+const bcrypt = require('bcryptjs');
 
 
+const userLogin = async (userInfo) => {
+  let findUser = await Models.users.findOne({
+    where: { email: userInfo.email },
+    raw: true
+  });
+
+  console.log(findUser,userInfo);
+  if (_.isEmpty(findUser)) TE("User Not Found");
+
+  if (findUser.email == userInfo.email && findUser.password == userInfo.password) {
+    let msg = "User Authenticated Successfully";
+    return msg;
+  } else {
+    let msg = "Invalid Credential";
+    return msg;
+  }
+}
 
 const create = async (userInfo) => {
   let findUser = await Models.users.findOne({
@@ -14,6 +32,9 @@ const create = async (userInfo) => {
   });
   if (findUser) TE("User Already Exists");
 
+  const salt = await bcrypt.genSalt(10);
+  const password = await bcrypt.hash(userInfo.password, salt);
+  userInfo.password = password;
   let [error, newUser] = await to(Models.users.create(userInfo));
   if (error) TE(error.message);
 
@@ -56,4 +77,4 @@ const profile = async (userList) => {
 
 
 
-module.exports = { create, update, deleteUser, getUsers, profile};
+module.exports = { create, update, deleteUser, getUsers, profile, userLogin };

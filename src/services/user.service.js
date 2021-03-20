@@ -13,15 +13,23 @@ const userLogin = async (userInfo) => {
     raw: true
   });
 
-  console.log(findUser,userInfo);
   if (_.isEmpty(findUser)) TE("User Not Found");
 
-  if (findUser.email == userInfo.email && findUser.password == userInfo.password) {
+  await new Promise((resolve, reject) => {
+    bcrypt.compare(userInfo.password, findUser.password, function (err, result, callback) {
+      userInfo.result = result;
+      resolve("");
+    });
+  })
+
+  if (userInfo.result == true) {
     let msg = "User Authenticated Successfully";
-    return msg;
+    let final = { message: msg, userDetails: findUser }
+    return final;
   } else {
-    let msg = "Invalid Credential";
-    return msg;
+    let msg = "Invalid Credentials"
+    let final = { message: msg };
+    return final;
   }
 }
 
@@ -43,7 +51,7 @@ const create = async (userInfo) => {
 };
 
 const update = async (userInfo) => {
-  return await Models.users.update(userInfo, { where: { user_name: userInfo.user_name } });
+  return await Models.users.update(userInfo, { where: { email: userInfo.email } });
 };
 
 const deleteUser = async (userInfo) => {

@@ -59,8 +59,7 @@ const userLogin = async function (req, res) {
 
   [err, user] = await to(userService.userLogin(userInfo));
   if (err) return ReE(res, err, 200);
-  console.log(user);
-  return ReS(res, {message:user}, 200, start);
+  return ReS(res, user, 200, start);
 };
 
 
